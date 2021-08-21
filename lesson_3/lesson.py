@@ -6,6 +6,7 @@
 """
 import json
 from pymongo import MongoClient, ASCENDING
+from pprint import pprint
 
 
 # Проигнорируем курсы валют
@@ -41,7 +42,7 @@ collection.insert_many(file_data)
 data = get_wage_gt(collection, 10000)
 
 for document in data:
-    print(document)
+    pprint(document)
 
 # Лучше конечно id объявления + источник парсинга брать(но он предварительно не парсился), для примера можно взять url
 collection.create_index([("url", ASCENDING)], unique=True)
@@ -49,7 +50,7 @@ collection.create_index([("url", ASCENDING)], unique=True)
 base_count = collection.count_documents({})
 
 for row in file_data:
-    collection.update_one({"url": row['url']}, {'$set': row})
+    collection.update_one({"url": row['url']}, {'$set': row}, upsert=True)
 
 after_insert_count = collection.count_documents({})
 
